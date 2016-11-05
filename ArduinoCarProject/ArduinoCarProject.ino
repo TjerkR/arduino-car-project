@@ -1,5 +1,5 @@
 /** Arduino Car System: main file
- * Version 3.0
+ * Version 3.1 BETA
  * Tjerk Reintsema
  */
 
@@ -10,6 +10,19 @@
  *  completely new sensor/motor functions need to be defined. To change the behaviour of the car itself, edit the 
  *  controlCar.ino file. There, the functions defined in this file can be used to tell the car what to do.
  */
+
+ /** CHANGLELOG - version 3.1 BETA (not yet tested on car)
+  *  new functions:
+  *  - Added functions turnLeft(), turnRight() for turning the car left/right for 1 second and ignoring the next color code
+  *  - Added a function goStraigh() for ignoring the next color code
+  *  - Added a function stopCar() to stop the car until directed otherwise
+  *  - Added a function trafficLight() to check if the traffic light is red (1) or green (0), both have equal chance
+  *  new behaviour:
+  *  - The car can now handle T-junctions and crossroads (if they are marked as such with color codes)
+  *  - Added functionality for checking traffic lights at crossroads, which have a 50 percent chance of being on or off
+  *  other:
+  *  - Added random seed generator via analogRead(leftLightSensor*1000)
+  */
 
 //////////////////////////////////////////////// INITIALIZATION /////////////////////////////////////////////////
 
@@ -26,6 +39,8 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725();
 Servo leftServo, rightServo;
 int calibrationL;
 int calibrationR;
+int ignoreColor;
+long randNumber;
 
 #define leftLightSensor A0
 #define rightLightSensor A1
@@ -100,7 +115,35 @@ float BLUE() {
   return part;
 }
 
+/* Functions for turning the car left, right or directing it straight ahead for a little while. */
+void turnRight() {
+  motorLeft(100);
+  motorRight(20);
+  ignoreColor = 1;
+  delay(1000);
+}
 
+void turnLeft() {
+  motorLeft(20);
+  motorRight(100);
+  ignoreColor = 1;
+  delay(1000);
+}
+
+void goStraight() {
+  ignoreColor = 1;
+  delay(1000);
+}
+
+void stopCar() {
+  motorLeft(0);
+  motorRight(0);
+}
+
+/* Function to check if the stoplight is on or not. On == 1, off == 0. */
+int trafficLight() {
+  return random(2); // TODO: replace this with a controllable signal eventually
+}
 
 /////////////////////////////////////////// ARDUINO STARTUP FUNCTION ////////////////////////////////////////////
 
@@ -115,6 +158,8 @@ void setup() {
 
   digitalWrite(leftLightSensor,HIGH); // configures left light sensor
   digitalWrite(rightLightSensor,HIGH); // configures right light sensor
+
+  randomSeed(analogRead(leftLightSensor)*10000);
 }
 
 
