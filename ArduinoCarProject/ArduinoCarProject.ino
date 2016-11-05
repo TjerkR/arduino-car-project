@@ -1,7 +1,7 @@
 /** Arduino Car System: main file
- * Version 2.2
+ * Version 2.3
  * Tjerk Reintsema
- * 1-11-2016
+ * 2-11-2016
  */
 
 /** CHANGELOG:
@@ -11,6 +11,7 @@
  * 2.0: completely rewrote code (1-11-2016)
  * 2.1: fixed issues and added more documentation (1-11-2016)
  * 2.2: using #defines for pin numbers, allows more flexibility (1-11-2016)
+ * 2.3: added functionality for backing up when encountering an obstacle (2-11-2016)
  */
 
 /** CONNECTIONS:
@@ -44,20 +45,21 @@
 
 //////////////////////////////////////////////// INITIALIZATION /////////////////////////////////////////////////
 
- #include <Servo.h>
- Servo leftServo, rightServo;
- int sample;
- int calibrationL;
- int calibrationR;
+#include <Servo.h>
+Servo leftServo, rightServo;
+int sample;
+int calibrationL;
+int calibrationR;
 
- #define LED 13
- #define horn 8
- #define leftLightSensor A0
- #define rightLightSensor A1
- #define leftIRsensor A2
- #define rightIRsensor A3
- #define leftMotor 6
- #define rightMotor 7
+
+#define LED 13
+#define horn 8
+#define leftLightSensor A0
+#define rightLightSensor A1
+#define leftIRsensor A2
+#define rightIRsensor A3
+#define leftMotor 6 // needs to be PWM port
+#define rightMotor 7 // idem
 
 
 
@@ -94,8 +96,8 @@ int checkDistanceRight() {return (2600.0 / sampleVoltage(rightIRsensor) - 0.148)
 
 /* These functions return the reflection measured by either of the bottom light sensors.
  * The output is a value between 0 and 100, where 0 is maximum reflection and 100 is no reflection. */
-int checkLineLeft() {return map(sampleVoltage(leftLightSensor), 0, 1023, 0, 100);}
-int checkLineRight() {return map(sampleVoltage(rightLightSensor), 0, 1023, 0, 100);}
+int checkLineLeft() {return map(analogRead(leftLightSensor), 0, 1023, 0, 100);}
+int checkLineRight() {return map(analogRead(rightLightSensor), 0, 1023, 0, 100);}
 
 
 /* These functions allow easy control of the motors. The input is a value from -100 to 100, where 100 corresponds to max speed
@@ -105,7 +107,7 @@ void motorRight(int value) {rightServo.write(90 - constrain((value + calibration
 
 
 /* This function sounds the horn of the car. */
-void beep() {tone(8,500,500);}
+void beep(int duration) {tone(horn,500,duration);}
 
 
 /* This function feeds sensor data to the serial port. This report is visible by going to Tools->Serial Monitor, while the
