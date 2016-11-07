@@ -3,7 +3,7 @@ This directory contains two subdirectories - one for the main system, and one fo
 
 The main directory (ArduinoCarProject) contains two files that need to be uploaded to the Arduino for it to work. The ArduinoCarProject.ino file contains the main Arduino code and a bunch of functions that allow the control of the car. The controlCar.ino file contains the controlCar() function, which is run continuously by the car when it is on, and contains instructions for what the car should do.
 
-HOW TO UPLOAD TO ARDUINO:  
+**HOW TO UPLOAD TO ARDUINO:**  
 1. Connect the Arduino to the computer  
 2. Open ArduinoCarProject.ino  
 3. Turn on the Arduino  
