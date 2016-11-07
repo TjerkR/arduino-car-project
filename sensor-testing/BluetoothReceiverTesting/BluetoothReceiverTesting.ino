@@ -3,13 +3,13 @@
 #define receiverPin 0
 #define transmitterPin 1
 
+SoftwareSerial bluetoothSerial = SoftwareSerial(receiverPin,transmitterPin);
+
 void setup() {
-  SoftwareSerial.begin();
-  SoftwareSerial(receiverPin,transmitterPin);
+  bluetoothSerial.begin(9600);
 }
 
 void loop() {
   char c = Serial.read();
-  if ( c ==
 
 }
