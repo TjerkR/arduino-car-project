@@ -27,7 +27,7 @@ void controlCar() {
   calibrationR = 0;
 
   // REMOTE CONTROL //
-  c = Serial.read(); // !!! Might not work if this overwrites default value of '0' !!!
+  c = bluetoothSerial.read(); // !!! Might not work if this overwrites default value of '0' !!!
   while (c != '0') {
     if (c == 'w') {
       motorLeft(80);
