@@ -1,5 +1,5 @@
 /** Arduino Car System: main file
- * Version 3.1 BETA
+ * Version 3.2 BETA
  * Tjerk Reintsema
  */
 
@@ -11,17 +11,8 @@
  *  controlCar.ino file. There, the functions defined in this file can be used to tell the car what to do.
  */
 
- /** CHANGLELOG - version 3.1 BETA (not yet tested on car)
-  *  new functions:
-  *  - Added functions turnLeft(), turnRight() for turning the car left/right for 1 second and ignoring the next color code
-  *  - Added a function goStraigh() for ignoring the next color code
-  *  - Added a function stopCar() to stop the car until directed otherwise
-  *  - Added a function trafficLight() to check if the traffic light is red (1) or green (0), both have equal chance
-  *  new behaviour:
-  *  - The car can now handle T-junctions and crossroads (if they are marked as such with color codes)
-  *  - Added functionality for checking traffic lights at crossroads, which have a 50 percent chance of being on or off
-  *  other:
-  *  - Added random seed generator via analogRead(leftLightSensor*1000)
+ /** CHANGLELOG - version 3.2 BETA (not tested on car yet)
+  *  - Car can now be remotely controlled via Bluetooth
   */
 
 //////////////////////////////////////////////// INITIALIZATION /////////////////////////////////////////////////
@@ -29,6 +20,7 @@
 #include <Servo.h>
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"
+#include <SoftwareSerial.h>
 
 /* Initialise with default values (int time = 2.4ms, gain = 1x) */
 Adafruit_TCS34725 tcs = Adafruit_TCS34725();
@@ -41,6 +33,7 @@ int calibrationL;
 int calibrationR;
 int ignoreColor;
 long randNumber;
+char c = '0';
 
 #define leftLightSensor A0
 #define rightLightSensor A1
@@ -51,6 +44,11 @@ long randNumber;
 
 #define leftMotor 10 // needs to be PWM port
 #define rightMotor 9 // idem
+
+#define receiverPin 3
+#define transmitterPin 4
+
+SoftwareSerial bluetoothSerial = SoftwareSerial(receiverPin,transmitterPin);
 
 
 
@@ -150,7 +148,9 @@ int trafficLight() {
 /* This function will be ran by the Arduino once at startup. */
 void setup() {
   Serial.begin(9600); // opens serial port, sets data rate to 9600 bps
-
+  
+  bluetoothSerial.begin(9600);
+  
   tcs.begin();
   
   leftServo.attach(leftMotor); // configure left motor

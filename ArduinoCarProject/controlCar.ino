@@ -1,5 +1,5 @@
 /** Arduino Car System: control function
- * Version 3.1 BETA
+ * Version 3.2 BETA
  * Tjerk Reintsema
  */
 
@@ -13,6 +13,7 @@
  *  - Handle crossroads with traffic lights (magenta)
  *  - Handle crossroads without traffic lights (yellow)
  *  - Handle T-junctions (red,green,blue)
+ *  - Remote control via Bluetooth
  */
 
 
@@ -24,6 +25,32 @@ void controlCar() {
   
   calibrationL = 0;
   calibrationR = 0;
+
+  // REMOTE CONTROL //
+  c = Serial.read(); // !!! Might not work if this overwrites default value of '0' !!!
+  while (c != '0') {
+    if (c == 'w') {
+      motorLeft(80);
+      motorRight(80);
+    }
+    if (c == 'a') {
+      motorLeft(20);
+      motorRight(80); 
+    }
+    if (c == 's') {
+      motorLeft(-50);
+      motorRight(-50);
+    }
+    if (c == 'd') {
+      motorLeft(80);
+      motorRight(20);
+    }
+    if (c == 'x') {
+      motorLeft(0);
+      motorRight(0);
+    }
+    // press 0 to switch to autopilot //
+  }
 
 
 
