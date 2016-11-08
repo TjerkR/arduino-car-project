@@ -3,13 +3,23 @@
 #define receiverPin 0
 #define transmitterPin 1
 
-SoftwareSerial bluetoothSerial(receiverPin,transmitterPin);
+SoftwareSerial bluetooth(receiverPin, transmitterPin);
+
+void writeAck()
+{
+  uint8_t payload[] = "ACK|0|\n";
+  bluetooth.write(payload, sizeof(payload));
+}
 
 void setup() {
-  bluetoothSerial.begin(9600);
+  bluetooth.begin(9600);
+  Serial.begin(9600);
 }
 
 void loop() {
-  char c = bluetoothSerial.read();
-
+  if (bluetooth.available()) {
+    String serialData = bluetooth.readString();
+    Serial.println(serialData);
+    writeAck();
+  }
 }
