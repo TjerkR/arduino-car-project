@@ -47,6 +47,7 @@ void controlCar() {
     motorRight(80);
   }
   /* this block makes the car back up when encountering an obstacle. */
+  /*
   if ( (checkDistanceLeft() < 5) && (checkDistanceRight() < 5) ) {
     motorLeft(-50);
     motorRight(-50);
@@ -65,6 +66,11 @@ void controlCar() {
     motorLeft(-50);
     motorRight(-15);
     delay(750);
+    motorLeft(0);
+    motorRight(0);
+  }
+  */
+  while ( (checkDistanceLeft() < 5) || (checkDistanceRight() < 5) ) {
     motorLeft(0);
     motorRight(0);
   }
