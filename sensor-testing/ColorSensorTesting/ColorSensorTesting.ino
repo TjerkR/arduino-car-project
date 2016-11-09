@@ -71,7 +71,7 @@ void loop() {
   else if ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35)) {
     Serial.print("BLAUW");
   }
-  else if ((RED() > 40) && (GREEN() < 28)) {
+  else if ((RED() > 35) && (GREEN() < 28)) {
     Serial.print("MAGENTA");
   }
   else if ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22)) {

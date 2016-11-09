@@ -132,7 +132,7 @@ void controlCar() {
   }
 
   // MAGENTA //
-  else if ((RED() > 40) && (GREEN() < 28)) {
+  else if ((RED() > 35) && (GREEN() < 28)) {
     Serial.print("MAGENTA");
     randNumber = random(3);
     if (ignoreColor == 1) {
