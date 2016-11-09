@@ -19,6 +19,16 @@
 /* This function tells the car what to do, using the functions defined in the main file. Make sure the controlCar() function is
  * inside the loop() function of the main file, otherwise it won't be executed. */
 void controlCar() {
+  Serial.print("\t \t \t red: \t");Serial.print(RED());Serial.print("\t");
+  Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
+  Serial.print("blue: \t");Serial.print(BLUE());Serial.print("\t");
+
+  Serial.print("left: \t");Serial.print(checkLineLeft());Serial.print("\t");
+  Serial.print("right: \t");Serial.print(checkLineRight());Serial.print("\t");
+
+  Serial.print("IR left: \t");Serial.print(checkDistanceLeft());Serial.print("\t");
+  Serial.print("IR right: \t");Serial.print(checkDistanceRight());Serial.println("\t");
+  
   
   // CALIBRATION //
   
@@ -46,31 +56,8 @@ void controlCar() {
     motorLeft(80);
     motorRight(80);
   }
-  /* this block makes the car back up when encountering an obstacle. */
-  /*
-  if ( (checkDistanceLeft() < 5) && (checkDistanceRight() < 5) ) {
-    motorLeft(-50);
-    motorRight(-50);
-    delay(750);
-    motorLeft(0);
-    motorRight(0);
-  }
-  else if (checkDistanceLeft() < 5) {
-    motorLeft(-15);
-    motorRight(-50);
-    delay(750);
-    motorLeft(0);
-    motorRight(0);
-  }
-  else if (checkDistanceRight() < 5) {
-    motorLeft(-50);
-    motorRight(-15);
-    delay(750);
-    motorLeft(0);
-    motorRight(0);
-  }
-  */
-  while ( (checkDistanceLeft() < 5) || (checkDistanceRight() < 5) ) {
+
+  while ( (checkDistanceLeft() > 625) || (checkDistanceRight() > 625) ) {
     motorLeft(0);
     motorRight(0);
   }
@@ -84,7 +71,7 @@ void controlCar() {
    */
    
   // ROOD //
-  if (RED() > 55) {
+  if (isRed) {
     Serial.print("ROOD");
     randNumber = random(2);
     if (ignoreColor == 1) {
@@ -100,7 +87,7 @@ void controlCar() {
   }
 
   // GROEN //
-  else if ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) {
+  else if (isGreen) {
     Serial.print("GROEN");
     randNumber = random(2);
     if (ignoreColor == 1) {
@@ -116,7 +103,7 @@ void controlCar() {
   }
 
   // BLAUW //
-  else if ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35)) {
+  else if (isBlue) {
     Serial.print("BLAUW");
     randNumber = random(2);
     if (ignoreColor == 1) {
@@ -132,7 +119,7 @@ void controlCar() {
   }
 
   // MAGENTA //
-  else if ((RED() > 35) && (GREEN() < 28)) {
+  else if (isMagenta) {
     Serial.print("MAGENTA");
     randNumber = random(3);
     if (ignoreColor == 1) {
@@ -157,7 +144,7 @@ void controlCar() {
   }
 
   // GEEL //
-  else if ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22)) {
+  else if (isYellow) {
     Serial.print("GEEL");
     randNumber = random(3);
     if (ignoreColor == 1) {
@@ -175,8 +162,6 @@ void controlCar() {
     }
   }
 
-  Serial.print("\t \t \t red: \t");Serial.print(RED());Serial.print("\t");
-  Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
-  Serial.print("blue: \t");Serial.println(BLUE());
+  
 }
 

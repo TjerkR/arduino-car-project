@@ -73,14 +73,21 @@ float sampleVoltage(int pin) {
 
 /* These functions return the distance measured by either of the IR sensors on the front of the car. 
  * This is a value between 4 and 80 cm - it doesn't work properly outside of this range */
-int checkDistanceLeft() {return (2600.0 / sampleVoltage(leftIRsensor) - 0.15);}
-int checkDistanceRight() {return (2600.0 / sampleVoltage(rightIRsensor) - 0.15);}
+//int checkDistanceLeft() {return (2600.0 / sampleVoltage(leftIRsensor) - 0.15);}
+//int checkDistanceRight() {return (2600.0 / sampleVoltage(rightIRsensor) - 0.15);}
+
+int checkDistanceLeft() {
+  return sampleVoltage(leftIRsensor);
+  }
+int checkDistanceRight() {
+  return sampleVoltage(rightIRsensor);
+  }
 
 
 /* These functions return the reflection measured by either of the bottom light sensors.
  * The output is a value between 0 and 100, where 0 is maximum reflection and 100 is no reflection. */
-int checkLineLeft() {return map(analogRead(leftLightSensor), 0, 1023, 0, 100);}
-int checkLineRight() {return map(analogRead(rightLightSensor), 0, 1023, 0, 100);}
+int checkLineLeft() {return map(analogRead(leftLightSensor), 333, 236, 0, 100);}
+int checkLineRight() {return map(analogRead(rightLightSensor), 430, 239, 0, 100);}
 
 
 /* These functions allow easy control of the motors. The input is a value from -100 to 100, where 100 corresponds to max speed
@@ -115,6 +122,12 @@ float BLUE() {
   return part;
 }
 
+bool isRed = (RED() > 55);
+bool isGreen = ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27));
+bool isBlue = ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35));
+bool isMagenta = ((RED() > 35) && (GREEN() < 28));
+bool isYellow = ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22));
+
 /* Functions for turning the car left, right or directing it straight ahead for a little while. */
 void turnRight() {
   motorLeft(100);
@@ -145,6 +158,18 @@ int trafficLight() {
   return random(2); // TODO: replace this with a controllable signal eventually
 }
 
+void report() {
+  Serial.print("red: \t");Serial.print(RED());Serial.print("\t");
+  Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
+  Serial.print("blue: \t");Serial.print(BLUE());Serial.print("\t");
+
+  Serial.print("left: \t");Serial.print(checkLineLeft());Serial.print("\t");
+  Serial.print("right: \t");Serial.print(checkLineRight());Serial.print("\t");
+
+  Serial.print("IR left: \t");Serial.print(checkDistanceLeft());Serial.print("\t");
+  Serial.print("IR right: \t");Serial.print(checkDistanceRight());Serial.println("\t");
+}
+
 /////////////////////////////////////////// ARDUINO STARTUP FUNCTION ////////////////////////////////////////////
 
 /* This function will be ran by the Arduino once at startup. */
@@ -169,4 +194,5 @@ void setup() {
 /* This function will be run continiuously by the Arduino after it has run the setup() function. */
 void loop() {
   controlCar();
+  
 }
