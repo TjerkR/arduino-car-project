@@ -6,8 +6,8 @@
 /** This program drives a traffic light. After startup it will be green for goTime seconds, then red for stopTime seconds, and
  *  then it keeps going through this cycle.
  */
-#define greenLED 3
-#define redLED 4
+#define greenLED 4
+#define redLED 2
 
 void green(int duration) {
   digitalWrite(greenLED,HIGH);
@@ -24,6 +24,10 @@ void red(int duration) {
 const int stopTime = 5;
 const int goTime = 10;
 
+int Fs = 2000;
+int trafficLight = 0;
+int count = 1;
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void setup() {
@@ -34,7 +38,25 @@ void setup() {
 }
 
 void loop() {
-  green(goTime);
-  red(stopTime);
+  //green(goTime);
+  //red(stopTime);
+
+  if (count >= 3000) {
+    count = 0;
+    digitalWrite(redLED,HIGH);
+    digitalWrite(greenLED,LOW);
+  }
+  else if (count > 2000) {
+    trafficLight = 1; 
+    digitalWrite(redLED,HIGH);
+    digitalWrite(greenLED,LOW);
+  }
+  else {
+    trafficLight = 0;
+    digitalWrite(greenLED,HIGH);
+    digitalWrite(redLED,LOW);
+  }
+  Serial.println(count);
+  count++;
 
 }
