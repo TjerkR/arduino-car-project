@@ -32,7 +32,11 @@ Servo leftServo, rightServo;
 int calibrationL;
 int calibrationR;
 int ignoreColor;
+int count = 1;
+int trafficLight = 1;
 long randNumber;
+int multiplier = 45; 
+int waitCount = 0;
 
 #define leftLightSensor A0
 #define rightLightSensor A1
@@ -132,24 +136,38 @@ float BLUE() {
 
 /* Functions for turning the car left, right or directing it straight ahead for a little while. */
 void turnRight() {
-  delay(700);
-  motorLeft(80);
-  motorRight(20);
   ignoreColor = 1;
-  delay(1000);
+  delay(700);
+  motorLeft(100);
+  motorRight(15);
+  //if ( (RED() > 50) || ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) || ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35))
+  //                  || ((RED() > 35) && (GREEN() < 28) && (BLUE() < 20)) || ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) ) {
+  ignoreColor = 0;
+  //                  }
+  delay(750);
 }
 
 void turnLeft() {
+  ignoreColor = 1;
   delay(700);
   motorLeft(3);
   motorRight(100);
-  ignoreColor = 1;
-  delay(1000);
+  //if ( (RED() > 50) || ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) || ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35))
+  //                  || ((RED() > 35) && (GREEN() < 28) && (BLUE() < 20)) || ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) ) {
+                      ignoreColor = 0;
+  //                  }
+  delay(750);
 }
 
 void goStraight() {
+  motorLeft(80);
+  motorRight(80);
   ignoreColor = 1;
-  delay(1000);
+  if ( (RED() > 50) || ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) || ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35))
+                    || ((RED() > 35) && (GREEN() < 28) && (BLUE() < 20)) || ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) ) {
+                      ignoreColor = 0;
+                    }
+  delay(250);
 }
 
 void stopCar() {
@@ -157,15 +175,14 @@ void stopCar() {
   motorRight(0);
 }
 
-/* Function to check if the stoplight is on or not. On == 1, off == 0. */
-int trafficLight() {
-  return random(2); // TODO: replace this with a controllable signal eventually
-}
-
 void report() {
-  Serial.print("red: \t");Serial.print(RED());Serial.print("\t");
+  Serial.print("\t red: \t");Serial.print(RED());Serial.print("\t");
   Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
   Serial.print("blue: \t");Serial.print(BLUE());Serial.print("\t");
+
+  Serial.print("ignoreColor: \t");Serial.print(ignoreColor);Serial.print("\t");
+
+  Serial.print("trafficLight: \t");Serial.print(trafficLight);Serial.print("\t");
 
   Serial.print("left: \t");Serial.print(checkLineLeft());Serial.print("\t");
   Serial.print("right: \t");Serial.print(checkLineRight());Serial.print("\t");
@@ -188,7 +205,7 @@ void setup() {
   digitalWrite(leftLightSensor,HIGH); // configures left light sensor
   digitalWrite(rightLightSensor,HIGH); // configures right light sensor
 
-  //randomSeed(analogRead(leftLightSensor)*10000);
+  randomSeed(analogRead(leftLightSensor)*10000);
 }
 
 
@@ -199,4 +216,31 @@ void setup() {
 void loop() {
   report();
   controlCar();
+  
+  
+  // traffic light stuff
+  if (waitCount != 0) {
+    count += waitCount;
+    waitCount = 0;
+  }
+  
+  if (count >= 4*multiplier) {
+    count = 0;
+    trafficLight = 0;
+    //digitalWrite(redLED,HIGH);
+    //digitalWrite(greenLED,LOW);
+  }
+  else if (count > 2*multiplier) {
+    trafficLight = 0; 
+    //digitalWrite(redLED,HIGH);
+    //digitalWrite(greenLED,LOW);
+  }
+  else {
+    trafficLight = 1;
+    //digitalWrite(greenLED,HIGH);
+    //digitalWrite(redLED,LOW);
+  }
+  //Serial.print("\t \t \t \t \t \t \t");Serial.print(trafficLight);Serial.print("\t");Serial.println(count);
+  count++;
+  
 }

@@ -58,13 +58,16 @@ void controlCar() {
    */
    
   // ROOD //
-  if ((RED() > 55)) {
-    while ((RED() > 55)) {}
+  if ((RED() > 43)) {
+    while ((RED() > 43)) {}
     Serial.print("ROOD");
+    Serial.print("\t red: \t");Serial.print(RED());Serial.print("\t");
+    Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
+    Serial.print("blue: \t");Serial.print(BLUE());Serial.println("\t");
     randNumber = random(2);
     if (ignoreColor == 1) {
-      ignoreColor == 0;
-      delay(250);
+      ignoreColor = 0;
+      delay(500);
     }
     else if (randNumber == 0) {
       turnRight();
@@ -78,10 +81,13 @@ void controlCar() {
   else if ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) {
     while ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) {}
     Serial.print("GROEN");
+    Serial.print("\t red: \t");Serial.print(RED());Serial.print("\t");
+    Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
+    Serial.print("blue: \t");Serial.print(BLUE());Serial.println("\t");
     randNumber = random(2);
     if (ignoreColor == 1) {
-      ignoreColor == 0;
-      delay(250);
+      ignoreColor = 0;
+      delay(500);
     }
     else if (randNumber == 0) {
       turnRight();
@@ -92,13 +98,16 @@ void controlCar() {
   }
 
   // BLAUW //
-  else if ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35)) {
-    while ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35)) {}
+  else if ((RED() < 35) && (GREEN() < 37) && (BLUE() > 34)) {
+    while ((RED() < 35) && (GREEN() < 37) && (BLUE() > 34)) {}
     Serial.print("BLAUW");
+    Serial.print("\t red: \t");Serial.print(RED());Serial.print("\t");
+    Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
+    Serial.print("blue: \t");Serial.print(BLUE());Serial.println("\t");
     randNumber = random(2);
-    if (ignoreColor == 1) {
-      ignoreColor == 0;
-      delay(250);
+    if (ignoreColor == 0) {
+      ignoreColor = 0;
+      delay(500);
     }
     else if (randNumber == 0) {
       turnLeft();
@@ -109,19 +118,25 @@ void controlCar() {
   }
 
   // MAGENTA //
-  else if ((RED() > 35) && (GREEN() < 28)) {
-    while ((RED() > 35) && (GREEN() < 28)) {}
+  else if ((RED() > 35) && (GREEN() < 30) && (BLUE() < 35)) {
+    while ((RED() > 35) && (GREEN() < 30) && (BLUE() < 35)) {}
     Serial.print("MAGENTA");
+    Serial.print("\t red: \t");Serial.print(RED());Serial.print("\t");
+    Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
+    Serial.print("blue: \t");Serial.print(BLUE());Serial.println("\t");
     randNumber = random(3);
     if (ignoreColor == 1) {
-      ignoreColor == 0;
-      delay(250);
+      ignoreColor = 0;
+      delay(500);
     }
     else {
-      if (trafficLight() == 1) {
+      if (trafficLight == 1) {
+        waitCount = multiplier - (count - 2*multiplier);
         stopCar();
-        delay(3000);
+        int waitTime = map(waitTime,0,multiplier,0,8000);
+        delay(waitTime);
       }
+      
       if (randNumber == 0) {
         turnLeft();
       }
@@ -135,13 +150,16 @@ void controlCar() {
   }
 
   // GEEL //
-  else if ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22)) {
-    while ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22)) {}
+  else if ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) {
+    while ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) {}
     Serial.print("GEEL");
+    Serial.print("\t red: \t");Serial.print(RED());Serial.print("\t");
+    Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
+    Serial.print("blue: \t");Serial.print(BLUE());Serial.println("\t");
     randNumber = random(3);
     if (ignoreColor == 1) {
-      ignoreColor == 0;
-      delay(250);
+      ignoreColor = 0;
+      delay(500);
     }
     else if (randNumber == 0) {
       turnLeft();
