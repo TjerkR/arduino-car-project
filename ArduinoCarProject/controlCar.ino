@@ -19,47 +19,34 @@
 /* This function tells the car what to do, using the functions defined in the main file. Make sure the controlCar() function is
  * inside the loop() function of the main file, otherwise it won't be executed. */
 void controlCar() {
-  Serial.print("\t \t \t red: \t");Serial.print(RED());Serial.print("\t");
-  Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
-  Serial.print("blue: \t");Serial.print(BLUE());Serial.print("\t");
-
-  Serial.print("left: \t");Serial.print(checkLineLeft());Serial.print("\t");
-  Serial.print("right: \t");Serial.print(checkLineRight());Serial.print("\t");
-
-  Serial.print("IR left: \t");Serial.print(checkDistanceLeft());Serial.print("\t");
-  Serial.print("IR right: \t");Serial.print(checkDistanceRight());Serial.println("\t");
-  
-  
-  // CALIBRATION //
-  
-  calibrationL = 0;
-  calibrationR = 0;
 
 
+  if ( (checkDistanceLeft() > 625) || (checkDistanceRight() > 625) ) {
+    while ( (checkDistanceLeft() > 625) || (checkDistanceRight() > 625) ) {
+      motorLeft(0);
+      motorRight(0);
+    }
+  delay(3000);
+  }
 
   // ROBOT COMMANDS //
   /* this block makes sure the car moves straight ahead when on the road, and turns when it encounters a corner to stay on the 
    * road if the car is off-road, it will turn in the direction opposite of the first sensor that detected it was off-road. */
-  if (checkLineLeft() > 20) {
-    while (checkLineLeft() > 20) {
-      motorLeft(80);
-      motorRight(20);
+  if (checkLineLeft() > 95) {
+    motorLeft(80);
+    motorRight(20);
+    while (checkLineLeft() > 95) {  
     }
   }
-  else if (checkLineRight() > 20) {
-    while (checkLineRight() > 20) {
-      motorLeft(20);
-      motorRight(80);
+  else if (checkLineRight() > 95) {
+    motorLeft(3);
+    motorRight(100);
+    while (checkLineRight() > 95) {  
     }
   }
   else {
     motorLeft(80);
     motorRight(80);
-  }
-
-  while ( (checkDistanceLeft() > 625) || (checkDistanceRight() > 625) ) {
-    motorLeft(0);
-    motorRight(0);
   }
 
   /* checking colors.
@@ -71,12 +58,13 @@ void controlCar() {
    */
    
   // ROOD //
-  if (isRed) {
+  if ((RED() > 55)) {
+    while ((RED() > 55)) {}
     Serial.print("ROOD");
     randNumber = random(2);
     if (ignoreColor == 1) {
       ignoreColor == 0;
-      delay(50);
+      delay(250);
     }
     else if (randNumber == 0) {
       turnRight();
@@ -87,12 +75,13 @@ void controlCar() {
   }
 
   // GROEN //
-  else if (isGreen) {
+  else if ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) {
+    while ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) {}
     Serial.print("GROEN");
     randNumber = random(2);
     if (ignoreColor == 1) {
       ignoreColor == 0;
-      delay(50);
+      delay(250);
     }
     else if (randNumber == 0) {
       turnRight();
@@ -103,12 +92,13 @@ void controlCar() {
   }
 
   // BLAUW //
-  else if (isBlue) {
+  else if ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35)) {
+    while ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35)) {}
     Serial.print("BLAUW");
     randNumber = random(2);
     if (ignoreColor == 1) {
       ignoreColor == 0;
-      delay(50);
+      delay(250);
     }
     else if (randNumber == 0) {
       turnLeft();
@@ -119,12 +109,13 @@ void controlCar() {
   }
 
   // MAGENTA //
-  else if (isMagenta) {
+  else if ((RED() > 35) && (GREEN() < 28)) {
+    while ((RED() > 35) && (GREEN() < 28)) {}
     Serial.print("MAGENTA");
     randNumber = random(3);
     if (ignoreColor == 1) {
       ignoreColor == 0;
-      delay(50);
+      delay(250);
     }
     else {
       if (trafficLight() == 1) {
@@ -144,12 +135,13 @@ void controlCar() {
   }
 
   // GEEL //
-  else if (isYellow) {
+  else if ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22)) {
+    while ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22)) {}
     Serial.print("GEEL");
     randNumber = random(3);
     if (ignoreColor == 1) {
       ignoreColor == 0;
-      delay(50);
+      delay(250);
     }
     else if (randNumber == 0) {
       turnLeft();

@@ -1,5 +1,5 @@
 /** Arduino Car System: main file
- * Version 3.1 BETA
+ * Version 4.0 BETA
  * Tjerk Reintsema
  */
 
@@ -11,17 +11,8 @@
  *  controlCar.ino file. There, the functions defined in this file can be used to tell the car what to do.
  */
 
- /** CHANGLELOG - version 3.1 BETA (not yet tested on car)
-  *  new functions:
-  *  - Added functions turnLeft(), turnRight() for turning the car left/right for 1 second and ignoring the next color code
-  *  - Added a function goStraigh() for ignoring the next color code
-  *  - Added a function stopCar() to stop the car until directed otherwise
-  *  - Added a function trafficLight() to check if the traffic light is red (1) or green (0), both have equal chance
-  *  new behaviour:
-  *  - The car can now handle T-junctions and crossroads (if they are marked as such with color codes)
-  *  - Added functionality for checking traffic lights at crossroads, which have a 50 percent chance of being on or off
-  *  other:
-  *  - Added random seed generator via analogRead(leftLightSensor*1000)
+ /** CHANGLELOG - version 4.0 BETA (not yet tested on car)
+  *  
   */
 
 //////////////////////////////////////////////// INITIALIZATION /////////////////////////////////////////////////
@@ -37,6 +28,7 @@ Adafruit_TCS34725 tcs = Adafruit_TCS34725();
    Connect VDD    to 3.3V DC
    Connect GROUND to common ground */
 Servo leftServo, rightServo;
+
 int calibrationL;
 int calibrationR;
 int ignoreColor;
@@ -44,10 +36,8 @@ long randNumber;
 
 #define leftLightSensor A0
 #define rightLightSensor A1
-#define leftIRsensor A2
-#define rightIRsensor A3
-#define SDA A4
-#define SCL A5
+#define leftIRsensor A3
+#define rightIRsensor A2
 
 #define leftMotor 10 // needs to be PWM port
 #define rightMotor 9 // idem
@@ -73,15 +63,12 @@ float sampleVoltage(int pin) {
 
 /* These functions return the distance measured by either of the IR sensors on the front of the car. 
  * This is a value between 4 and 80 cm - it doesn't work properly outside of this range */
-//int checkDistanceLeft() {return (2600.0 / sampleVoltage(leftIRsensor) - 0.15);}
-//int checkDistanceRight() {return (2600.0 / sampleVoltage(rightIRsensor) - 0.15);}
-
 int checkDistanceLeft() {
   return sampleVoltage(leftIRsensor);
-  }
+}
 int checkDistanceRight() {
   return sampleVoltage(rightIRsensor);
-  }
+}
 
 
 /* These functions return the reflection measured by either of the bottom light sensors.
@@ -92,8 +79,29 @@ int checkLineRight() {return map(analogRead(rightLightSensor), 430, 239, 0, 100)
 
 /* These functions allow easy control of the motors. The input is a value from -100 to 100, where 100 corresponds to max speed
  * ahead and -100 corresponds to max speed backwards. Change the values of calibrationL and calibrationR to calibrate. */
-void motorLeft(int value) {leftServo.write(90 + constrain((value + calibrationL)/10,-10,10));}
-void motorRight(int value) {rightServo.write(90 - constrain((value + calibrationR)/10,-10,10));}
+void motorLeft(int value) 
+{
+  int zeropointL = 95;
+  if (value < 0) {
+    value = map(value, -100, 0, -95, 0);
+  }
+  else if (value > 0) {
+    value = map(value, 0, 100, 0, 85);
+  }
+  leftServo.write(zeropointL + constrain((value),-95,85));
+}
+
+void motorRight(int value) 
+{
+  int zeropointR = 95;
+  if (value < 0) {
+    value = map(value, -100, 0, -9, 0);
+  }
+  else if (value > 0) {
+    value = map(value, 0, 100, 0, 11);
+  }
+  rightServo.write(zeropointR - constrain((value),-9,11));
+}
 
 
 /* Color sensor functions. RED() returns the percentage of red light of the total light. */
@@ -122,22 +130,18 @@ float BLUE() {
   return part;
 }
 
-bool isRed = (RED() > 55);
-bool isGreen = ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27));
-bool isBlue = ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35));
-bool isMagenta = ((RED() > 35) && (GREEN() < 28));
-bool isYellow = ((RED() > 30) && (GREEN() > 40) && (BLUE() < 22));
-
 /* Functions for turning the car left, right or directing it straight ahead for a little while. */
 void turnRight() {
-  motorLeft(100);
+  delay(700);
+  motorLeft(80);
   motorRight(20);
   ignoreColor = 1;
   delay(1000);
 }
 
 void turnLeft() {
-  motorLeft(20);
+  delay(700);
+  motorLeft(3);
   motorRight(100);
   ignoreColor = 1;
   delay(1000);
@@ -179,12 +183,12 @@ void setup() {
   tcs.begin();
   
   leftServo.attach(leftMotor); // configure left motor
-  rightServo.attach(rightMotor); // configure right motor
+  rightServo.attach(rightMotor); // configure right motr
 
   digitalWrite(leftLightSensor,HIGH); // configures left light sensor
   digitalWrite(rightLightSensor,HIGH); // configures right light sensor
 
-  randomSeed(analogRead(leftLightSensor)*10000);
+  //randomSeed(analogRead(leftLightSensor)*10000);
 }
 
 
@@ -193,6 +197,6 @@ void setup() {
 
 /* This function will be run continiuously by the Arduino after it has run the setup() function. */
 void loop() {
+  report();
   controlCar();
-  
 }
