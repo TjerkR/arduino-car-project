@@ -14,7 +14,7 @@ The main directory (ArduinoCarProject) contains two files that need to be upload
 8. Ready to go! Turn the Arduino on again and it will behave as defined in the code  
 
 The sensor-testing directory contains programs for testing the following sensors/accesories:
-- HM-05 Bluetooth Module
+- HC-05 Bluetooth Module
 - Servo Motor
 - Reflection Sensor
 - Color Sensor
