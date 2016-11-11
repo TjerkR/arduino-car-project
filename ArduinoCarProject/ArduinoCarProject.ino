@@ -1,5 +1,5 @@
 /** Arduino Car System: main file
- * Version 4.0 BETA
+ * Version 4.0
  * Tjerk Reintsema
  */
 
@@ -11,29 +11,23 @@
  *  controlCar.ino file. There, the functions defined in this file can be used to tell the car what to do.
  */
 
- /** CHANGLELOG - version 4.0 BETA (not yet tested on car)
-  *  
-  */
-
 //////////////////////////////////////////////// INITIALIZATION /////////////////////////////////////////////////
 
 #include <Servo.h>
 #include <Wire.h>
 #include "Adafruit_TCS34725.h"
 
-/* Initialise with default values (int time = 2.4ms, gain = 1x) */
 Adafruit_TCS34725 tcs = Adafruit_TCS34725();
 /* Connect SCL    to analog 5
    Connect SDA    to analog 4
    Connect VDD    to 3.3V DC
    Connect GROUND to common ground */
+
 Servo leftServo, rightServo;
 
-int calibrationL;
-int calibrationR;
 int ignoreColor;
 int count = 1;
-int trafficLight = 1;
+int trafficLight = 0;
 long randNumber;
 int multiplier = 45; 
 int waitCount = 0;
@@ -43,35 +37,33 @@ int waitCount = 0;
 #define leftIRsensor A3
 #define rightIRsensor A2
 
-#define leftMotor 10 // needs to be PWM port
-#define rightMotor 9 // idem
+#define leftMotor 10
+#define rightMotor 9
 
 
 
 //////////////////////////////////////////// FUNCTION DEFINITIONS //////////////////////////////////////////////
 
-/* This function samples the voltage across the specified pin, and returns this as a float. */
-float sampleVoltage(int pin) {
-  int samples = 3;
+/* This function returns the average of the last <samples> readings of the voltage over <pin>. */
+float sampleVoltage(int pin, int samples) {
   float average = 0;
-
   int i;
+ 
   for (i = 0; i < samples; i++) {
     average += analogRead(pin);
     delay(8);
   }
-  average /= samples;
-  return average;
+ 
+  return average/samples;
 }
 
 
-/* These functions return the distance measured by either of the IR sensors on the front of the car. 
- * This is a value between 4 and 80 cm - it doesn't work properly outside of this range */
+/* These functions return a value proportional tot the distance measured by the IR sensors. */
 int checkDistanceLeft() {
-  return sampleVoltage(leftIRsensor);
+  return sampleVoltage(leftIRsensor,3);
 }
 int checkDistanceRight() {
-  return sampleVoltage(rightIRsensor);
+  return sampleVoltage(rightIRsensor,3);
 }
 
 
@@ -82,7 +74,7 @@ int checkLineRight() {return map(analogRead(rightLightSensor), 430, 239, 0, 100)
 
 
 /* These functions allow easy control of the motors. The input is a value from -100 to 100, where 100 corresponds to max speed
- * ahead and -100 corresponds to max speed backwards. Change the values of calibrationL and calibrationR to calibrate. */
+ * ahead and -100 corresponds to max speed backwards. */
 void motorLeft(int value) 
 {
   int zeropointL = 95;
@@ -137,44 +129,51 @@ float BLUE() {
 /* Functions for turning the car left, right or directing it straight ahead for a little while. */
 void turnRight() {
   ignoreColor = 1;
+  
   delay(700);
   motorLeft(100);
   motorRight(15);
-  //if ( (RED() > 50) || ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) || ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35))
-  //                  || ((RED() > 35) && (GREEN() < 28) && (BLUE() < 20)) || ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) ) {
+  
   ignoreColor = 0;
-  //                  }
+  
   delay(750);
 }
 
+
 void turnLeft() {
   ignoreColor = 1;
+  
   delay(700);
   motorLeft(3);
   motorRight(100);
-  //if ( (RED() > 50) || ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) || ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35))
-  //                  || ((RED() > 35) && (GREEN() < 28) && (BLUE() < 20)) || ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) ) {
-                      ignoreColor = 0;
-  //                  }
+  
+  ignoreColor = 0;
+  
   delay(750);
 }
+
 
 void goStraight() {
   motorLeft(80);
   motorRight(80);
   ignoreColor = 1;
-  if ( (RED() > 50) || ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) || ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35))
-                    || ((RED() > 35) && (GREEN() < 28) && (BLUE() < 20)) || ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) ) {
-                      ignoreColor = 0;
-                    }
+  if ( (RED() > 50) || 
+       ((RED() < 35) && (GREEN() > 40) && (BLUE() < 27)) || 
+       ((RED() < 30) && (GREEN() < 37) && (BLUE() > 35)) || 
+       ((RED() > 35) && (GREEN() < 28) && (BLUE() < 20)) || 
+       ((RED() > 35) && (GREEN() > 35) && (BLUE() < 25)) ) {
+  ignoreColor = 0;
   delay(250);
+  }
 }
+
 
 void stopCar() {
   motorLeft(0);
   motorRight(0);
 }
 
+/* Function used to see what the sensors are reading, for debugging purposes. */
 void report() {
   Serial.print("\t red: \t");Serial.print(RED());Serial.print("\t");
   Serial.print("green: \t");Serial.print(GREEN());Serial.print("\t");
@@ -217,8 +216,7 @@ void loop() {
   report();
   controlCar();
   
-  
-  // traffic light stuff
+  // traffic light signal
   if (waitCount != 0) {
     count += waitCount;
     waitCount = 0;
@@ -227,20 +225,13 @@ void loop() {
   if (count >= 4*multiplier) {
     count = 0;
     trafficLight = 0;
-    //digitalWrite(redLED,HIGH);
-    //digitalWrite(greenLED,LOW);
   }
   else if (count > 2*multiplier) {
     trafficLight = 0; 
-    //digitalWrite(redLED,HIGH);
-    //digitalWrite(greenLED,LOW);
   }
   else {
     trafficLight = 1;
-    //digitalWrite(greenLED,HIGH);
-    //digitalWrite(redLED,LOW);
   }
-  //Serial.print("\t \t \t \t \t \t \t");Serial.print(trafficLight);Serial.print("\t");Serial.println(count);
   count++;
   
 }
