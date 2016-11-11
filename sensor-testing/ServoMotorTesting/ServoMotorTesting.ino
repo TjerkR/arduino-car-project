@@ -5,9 +5,6 @@
 
 #include <Servo.h>
 Servo leftServo, rightServo;
-int calibrationL;
-int calibrationR;
-
 
 #define leftMotor 10 // needs to be PWM port
 #define rightMotor 9 // idem
@@ -42,19 +39,7 @@ void motorRight(int value)
   rightServo.write(zeropointR - constrain((value),-9,11));
 }
 
-/// TESTS!
-/*
-void motorLeft(int value) 
-{
-  leftServo.write(90 + constrain( (0 + 50)/10,-10,10  )       );   --> 95 = stop
-}
 
-
-void motorRight(int value) 
-{
-  rightServo.write(90 - constrain((0 + -50)/10,-10,10)); ---> 85 = stop
-}
-*/
 
 /////////////////////////////////////////// ARDUINO STARTUP FUNCTION ////////////////////////////////////////////
 
@@ -75,9 +60,6 @@ void setup() {
 
 /* This function will be run continiuously by the Arduino after it has run the setup() function. */
 void loop() {
-  
-  //calibrationL = 50; // 50 for stand still, -50 R
-  //calibrationR = -50;
 
   char c = Serial.read();
   if (c == 'w') {
@@ -100,52 +82,4 @@ void loop() {
     motorLeft(0);
     motorRight(0);
   }
-
-
-  /*
-  char c = Serial.read();
-  if (c == 'x') {
-  leftServo.write(90      + 5);
-  rightServo.write(90     + 5);
-  }
-
-  if (c == 'w') {
-  leftServo.write(180     + 0); //35
-  rightServo.write(0      + 84);   //5
-  }
-
-  if (c == 's') {
-  leftServo.write(0       + 0); //25
-  rightServo.write(180    - 76);   //5
-  }
-  */
-
-  /*
-  char c = Serial.read();
-  if (c == 'w') {
-    motorLeft(80);
-    motorRight(80);
-  }
-  if (c == 's') {
-    motorLeft(-80);
-    motorRight(-80);
-  }
-  if (c == 'a') {
-    motorLeft(20);
-    motorRight(80);
-  }
-  if (c == 'd') {     
-    motorLeft(80);
-    motorRight(20);
-  }
-  if (c == 'x') {
-    motorLeft(0);
-    motorRight(0);
-  }
-
-  if (c == 't') {
-    leftServo.write(180);
-    rightServo.write(0);
-  }
-  */
 }
