@@ -1,16 +1,14 @@
 /** Arduino Car System: control function
- * Version 3.1 BETA
+ * Version 4.0
  * Tjerk Reintsema
  */
 
 /** CURRENT FUNCTIONALITY OF THE CAR:
- *  - Follow a white/colored road bounded by black/gray
- *  - Back up when encountering an obstacle
- *    - Straight when both IR sensors see obstacle
- *    - Left when left IR sensor sees obstacle
- *    - Right when right IR sensor sees obstacle
+ *  - Follow a white/colored road with black/gray borders
+ *  - Wait when detecting an obstacle
  *  - Detect colors on the ground (red,green,blue,magenta,yellow)
  *  - Handle crossroads with traffic lights (magenta)
+ *    - Know whether the traffic light is red or green
  *  - Handle crossroads without traffic lights (yellow)
  *  - Handle T-junctions (red,green,blue)
  */
@@ -20,7 +18,7 @@
  * inside the loop() function of the main file, otherwise it won't be executed. */
 void controlCar() {
 
-
+  /* this block makes the car wait when it encounters an obstacle 4 cm or less in front of it. */
   if ( (checkDistanceLeft() > 625) || (checkDistanceRight() > 625) ) {
     while ( (checkDistanceLeft() > 625) || (checkDistanceRight() > 625) ) {
       motorLeft(0);
@@ -29,19 +27,19 @@ void controlCar() {
   delay(3000);
   }
 
-  // ROBOT COMMANDS //
+  
   /* this block makes sure the car moves straight ahead when on the road, and turns when it encounters a corner to stay on the 
    * road if the car is off-road, it will turn in the direction opposite of the first sensor that detected it was off-road. */
-  if (checkLineLeft() > 95) {
+  if (checkLineLeft() > 90) {
     motorLeft(80);
     motorRight(20);
-    while (checkLineLeft() > 95) {  
+    while (checkLineLeft() > 90) {  
     }
   }
-  else if (checkLineRight() > 95) {
+  else if (checkLineRight() > 90) {
     motorLeft(3);
     motorRight(100);
-    while (checkLineRight() > 95) {  
+    while (checkLineRight() > 90) {  
     }
   }
   else {
@@ -49,7 +47,9 @@ void controlCar() {
     motorRight(80);
   }
 
-  /* checking colors.
+  
+  /* The next few functions enable the car to detect colored strips on the road which identify T-junctions and crossroads, and 
+     act accordingly.
    * red     -> T-junction right/straight 
    * green   -> T-junction right/left
    * blue    -> T-junction left/straigt
