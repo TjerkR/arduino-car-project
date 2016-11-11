@@ -11,21 +11,17 @@ int sample;
 
 //////////////////////////////////////////// FUNCTION DEFINITIONS //////////////////////////////////////////////
 
-/* This function samples the voltage across the specified pin, and returns this as a float. */
-float sampleVoltage(int pin) {
-  int i;
-  int SAMPLES = 3; // CHANGED FROM 5
+/* This function returns the average of the last <samples> readings of the voltage over <pin>. */
+float sampleVoltage(int pin, int samples) {
   float average = 0;
-  float voltage;
-
-  for (i = 0; i < SAMPLES; i++) {
-    sample = analogRead(pin);
-    average += sample;
-    delay(8); // CHANGED FROM 10
+  int i;
+ 
+  for (i = 0; i < samples; i++) {
+    average += analogRead(pin);
+    delay(8);
   }
-  average /= SAMPLES;
-  voltage = average;
-  return voltage;
+ 
+  return average/samples;
 }
 
 
@@ -34,8 +30,8 @@ float sampleVoltage(int pin) {
  * This is a value between 3 and 40 cm - it doesn't work properly outside of this range */
 //int checkDistanceLeft() {return (12000.0 / sampleVoltage(leftIRsensor) - 3.5);}
 //int checkDistanceRight() {return (12000.0 / sampleVoltage(rightIRsensor) - 3.5);}
-int checkDistanceLeft() {return sampleVoltage(leftIRsensor);}
-int checkDistanceRight() {return sampleVoltage(rightIRsensor);}
+int checkDistanceLeft() {return sampleVoltage(leftIRsensor,3);}
+int checkDistanceRight() {return sampleVoltage(rightIRsensor,3);}
 
 
 /* This function feeds sensor data to the serial port. This report is visible by going to Tools->Serial Monitor, while the
